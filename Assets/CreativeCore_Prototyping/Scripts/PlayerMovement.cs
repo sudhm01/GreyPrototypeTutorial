@@ -1,29 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed = 5f;
-    public Rigidbody rb;
-    // Start is called before the first frame update
+    public float speed = 5.0f;
+    public float turnSpeed = 360;
+    public float gravity = 20.0f;
+
+    private CharacterController controller;
+    private Vector3 moveDirection = Vector3.zero;
+
     void Start()
     {
-        
+        controller = GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
-    }
+        if (controller.isGrounded)
+        {
+            float horizontal = Input.GetAxis("Horizontal");
+            float vertical = Input.GetAxis("Vertical");
 
-    private void FixedUpdate()
-    {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+            // Move the player based on input
+            moveDirection = new Vector3(horizontal, 0, vertical);
+            moveDirection = transform.TransformDirection(moveDirection);
+            moveDirection *= speed;
+        }
 
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        rb.AddForce(movement * speed);
+        // Apply gravity
+        moveDirection.y -= gravity * Time.deltaTime;
+
+        // Move the controller
+        controller.Move(moveDirection * Time.deltaTime);
     }
 }
